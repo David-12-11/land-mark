@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Life | St. Andrews Secondary School</title>
+    <!-- We link to student-life.css which contains the layout system we saved earlier -->
+    <link rel="stylesheet" href="student-life.css">
+    <style>
+
+/* ==========================================
+   1. COLOR SCHEME MATRIX & GLOBAL RULES
+   ========================================== */
+:root {
+    --primary-color: #0d2c54;
+    --secondary-color: #c9a66b;
+    --text-color: #333333;
+    --light-bg: #f8f9fa;
+    --white: #ffffff;
+    --border-color: #e0e0e0;
+    --transition: all 0.3s ease;
+    --max-width: 1200px;
+    --shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+    --primary-color: #1a3e6c;
+    --secondary-color: #dfba7f;
+    --text-color: #f1f1f1;
+    --light-bg: #121212;
+    --white: #1e1e1e;
+    --border-color: #333333;
+    --shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--white);
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Section Title Mechanics */
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+[data-theme="dark"] .section-header h2 { color: var(--white); }
+
+.section-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* ==========================================
+   2. REUSABLE CARDS & GRID ENGINES
+   ========================================== */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 40px; align-items: center; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+.card {
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.card-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.card-body { padding: 25px; }
+.card-body h3 { margin-bottom: 12px; color: var(--primary-color); font-size: 1.4rem; }
+[data-theme="dark"] .card-body h3 { color: var(--white); }
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: var(--light-bg);
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   3. FIXED AUTO-MUTATING SLIDESHOW FRAME
+   ========================================== */
+.slideshow-frame {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    background-color: #000;
+    margin-top: 20px;
+}
+
+.gallery-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.gallery-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.slideshow-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    color: white;
+    z-index: 3;
+}
+
+.slideshow-overlay h3 {
+    font-size: 1.8rem;
+    
+    margin-bottom: 5px;
+}
+
+/* ==========================================
+   4. NAVIGATION HEADER & TOP BAR
+   ========================================== */
+header {
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.top-bar {
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 0.85rem;
+    padding: 8px 0;
+}
+
+.top-bar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-contacts span, .top-links a {
+    margin-right: 15px;
+    color: #ddd;
+    text-decoration: none;
+}
+
+.top-links a:hover { color: var(--secondary-color); }
+
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.logo-text h1 { font-size: 1.8rem; color: var(--primary-color); }
+[data-theme="dark"] .logo-text h1 { color: var(--white); }
+.logo-text span { font-size: 0.8rem; display: block; letter-spacing: 2px; color: var(--secondary-color); }
+
+.nav-links { display: flex; list-style: none; align-items: center; }
+.nav-links > li { position: relative; padding: 10px 15px; }
+.nav-links a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: var(--transition); }
+.nav-links a:hover, .nav-links .active { color: var(--secondary-color); }
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    list-style: none;
+    min-width: 200px;
+    display: none;
+    border-top: 3px solid var(--secondary-color);
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown:hover .dropdown-menu { display: block; }
+
+.nav-actions { display: flex; align-items: center; gap: 15px; }
+#theme-toggle { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-color); }
+
+.hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+.hamburger span { width: 25px; height: 3px; background-color: var(--text-color); transition: var(--transition); }
+
+/* ==========================================
+   5. COMPREHENSIVE FOOTER STRUCTURE
+   ========================================== */
+footer {
+    background-color: #06162b;
+    color: #a0aec0;
+    padding: 60px 0 20px;
+    font-size: 0.95rem;
+}
+
+footer h4 { color: white; margin-bottom: 20px; }
+footer a { color: #a0aec0; text-decoration: none; transition: var(--transition); }
+footer a:hover { color: var(--secondary-color); }
+footer ul { list-style: none; }
+footer ul li { margin-bottom: 10px; }
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.btn-secondary:hover { background-color: var(--white); }
+.newsletter-form { display: flex; gap: 10px; margin-top: 15px; }
+.newsletter-form input { padding: 10px; border: none; border-radius: 4px; flex-grow: 1; }
+
+@media (max-width: 768px) {
+    .top-bar { display: none; }
+    .hamburger { display: flex; }
+    .nav-links {
+        position: fixed;
+        top: 75px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 75px);
+        background-color: var(--white);
+        flex-direction: column;
+        padding: 30px;
+        transition: var(--transition);
+        overflow-y: auto;
+    }
+    .nav-links.active { left: 0; }
+    .nav-links li { width: 100%; padding: 12px 0; }
+    .dropdown-menu { position: static; box-shadow: none; width: 100%; padding-left: 20px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .slideshow-frame { height: 350px; }
+}
+
+
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+       1. GLOBAL INSTITUTION HEADER & NAVIGATION
+       ========================================== -->
+    <header>
+        <div class="top-bar">
+            <div class="container">
+                <div class="top-contacts">
+                    <span>📞 +211 920 513 259</span>
+                    <span>✉️ landmarkhighschool211@gmail.com</span>
+                </div>
+                <div class="top-links">
+                    <a href="index.html#admissions">Apply Now</a>
+                    <a href="index.html#resources">Portals</a>
+                </div>
+            </div>
+        </div>
+
+        <nav class="container main-nav">
+            <div class="logo-text">
+                <h1>LANDMARK</h1>
+                <span>HIGH SCHOOL</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html#home">Home</a></li>
+                <li class="dropdown">
+                    <a href="index.html#about">About Us</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#history">Our History</a></li>
+                        <li><a href="index.html#vision-mission">Vision & Mission</a></li>
+                        <li><a href="index.html#leadership">Leadership Team</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#academics">Academics</a></li>
+                <li><a href="index.html#admissions">Admissions</a></li>
+                <li><a href="student-life.html" class="active">Student Life</a></li>
+                <li><a href="staff.html">Staff</a></li>
+                <li><a href="index.html#news-events">News</a></li>
+                <li><a href="index.html#gallery">Gallery</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button id="theme-toggle" aria-label="Toggle Dark Mode">🌙</button>
+                <div class="hamburger" aria-label="Toggle Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ==========================================
+       2. STUDENT LIFE MAIN CONTENT & ACTIVITIES
+       ========================================== -->
+    <main style="padding: 60px 0;">
+        <div class="container">
+            
+            <div class="section-header">
+                <h2>Campus & Student Life</h2>
+                <p>Nurturing multi-dimensional growth through sports, creative clubs, and social impact programs</p>
+            </div>
+
+            <!-- Core Campus Core Activities Grid -->
+            <div class="grid-3" style="margin-bottom: 60px;">
+                
+                <!-- Activity 1: Athletics -->
+                <div class="card">
+                    <img src="sport.jpg" alt="Championship Athletics" class="card-img">
+                    <div class="card-body">
+                        <span class="badge">Athletics</span>
+                        <h3>Championship Sports</h3>
+                        <p>Our athletic programs emphasize physical fitness, teamwork, and strategic discipline across varsity soccer, basketball, swimming, and track squads.</p>
+                    </div>
+                </div>
+
+                <!-- Activity 2: Clubs -->
+                <div class="card">
+                    <img src="admission.jpg" alt="Clubs & Societies" class="card-img">
+                    <div class="card-body">
+                        <span class="badge">Academic Clubs</span>
+                        <h3>Clubs & Societies</h3>
+                        <p>Students explore passions in our high-tech Robotics Programming Lab, competitive Debate Society, Chess Club, Environmental Council, and Creative Arts Ensembles.</p>
+                    </div>
+                </div>
+
+                <!-- Activity 3: Community Service -->
+                <div class="card">
+                    <img src="officialphoto.jpg" alt="Community Outreach" class="card-img">
+                    <div class="card-body">
+                        <span class="badge">Social Impact</span>
+                        <h3>Community Service</h3>
+                        <p>Through regional volunteer outreach initiatives, our students active citizen participation, empathy, and positive local and global social accountability.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ==========================================
+               3. INTEGRATED AUTO-CHANGING PICTURE SLIDESHOW
+               ========================================== -->
+            <div class="section-header" style="margin-top: 80px; margin-bottom: 30px;">
+                <h2>Campus Life Slideshow</h2>
+                <p>A panoramic look into student achievements, interactive classrooms, and student activities</p>
+            </div>
+
+            <div class="slideshow-frame">
+                <!-- 5 Sequential Fading Image Elements -->
+                <img src="landmark.jpg" alt="School Morning Assembly" class="gallery-slide active">
+                <img src="officialphoto.jpg" alt="Inter-School Football Finals" class="gallery-slide">
+                <img src="admission.jpg" alt="Annual Music and Theatre Production" class="gallery-slide">
+                <img src="exam.jpg" alt="Student Break Time" class="gallery-slide">
+                <img src="break.jpg" alt="Senior Class Graduation Ceremony" class="gallery-slide">
+
+                <!-- Shared Descriptive Captions Banner Overlay -->
+                <div class="slideshow-overlay">
+                    <h3 id="slideshow-caption-title">Science Laboratory Inquiry</h3>
+                    <p id="slideshow-caption-desc">Students engaging in hands-on physics experimentation and raw data logging.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ==========================================
+       4. GLOBAL INSTITUTION FOOTER BLOCK
+       ========================================== -->
+    <footer>
+        <div class="container grid-3">
+            <div>
+                <h4>LandMark High School</h4>
+                <p>Fostering an ecosystem of intellectual brilliance, creative integrity, and global citizenship since 1984.</p>
+                <p style="margin-top: 15px; font-size: 0.8rem;">&copy; 2026 St. Andrews. All Rights Reserved.</p>
+            </div>
+            <div>
+                <h4>Quick Menu Links</h4>
+                <ul>
+                    <li><a href="index.html#about">About Our Mission</a></li>
+                    <li><a href="index.html#academics">Curriculum & Exams</a></li>
+                    <li><a href="index.html#admissions">Enrollment Data</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Stay Connected</h4>
+                <p>Join our newsletter list for event updates and school notifications.</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
+                    <input type="email" placeholder="Your Email Address" required>
+                    <button type="submit" class="btn btn-secondary" style="padding: 10px 15px;">Join</button>
+                </form>
+            </div>
+        </div>
+    </footer>
+
+    <!-- We inject our localized script engine hook below -->
+    <script src="student-life.js"></script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+    
+    // ==========================================
+    // 1. GLOBAL MOBILE NAVBAR HAMBURGER SYSTEM
+    // ==========================================
+    const hamburger = document.querySelector(".hamburger");
+    const navLinks = document.querySelector(".nav-links");
+
+    if (hamburger && navLinks) {
+        hamburger.addEventListener("click", () => {
+            navLinks.classList.toggle("active");
+            hamburger.classList.toggle("toggle");
+        });
+
+        // Close mobile dropdown when a user clicks anywhere outside the nav canvas
+        document.addEventListener("click", (e) => {
+            if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove("active");
+                hamburger.classList.remove("toggle");
+            }
+        });
+    }
+
+    // ==========================================
+    // 2. INTER-PAGE DARK MODE LOCAL ARCHITECTURE
+    // ==========================================
+    const themeToggle = document.getElementById("theme-toggle");
+    const savedTheme = localStorage.getItem("theme") || "light";
+    
+    // Immediately paint document tree based on synced state variable
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    if (themeToggle) {
+        themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+        
+        themeToggle.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            themeToggle.textContent = newTheme === "dark" ? "☀️" : "🌙";
+        });
+    }
+
+    // ==========================================
+    // 3. CAMPUS LIFE FADING SLIDESHOW ENGINE
+    // ==========================================
+    const fadingSlides = document.querySelectorAll(".gallery-slide");
+    const captionTitle = document.getElementById("slideshow-caption-title");
+    const captionDesc = document.getElementById("slideshow-caption-desc");
+
+    // Comprehensive array metadata mapping explicitly to our 5 target images
+    const slideMetadata = [
+        {
+            title: "School Graduation Day",
+            desc: "Students Celebrating The Happeness of Our Brave and Smart Final Year Students."
+        },
+        {
+            title: "Education is number one priority in Lakes States",
+            desc: "Landmark varsity squad sitting together while looking into the future of Rumbek."
+        },
+        {
+            title: "Practicals Skills",
+            desc: "Landmark is where the student ideas are transform into inovative thinkig, ready for real world solving problem."
+        },
+        {
+            title: "Exam  ",
+            desc: "Formal assessment designed to measure a person's knowledge, skills, aptitude, or qualifications in a specific subject in Landmark High School"
+        },
+        {
+            title: "Break Time",
+            desc: "The school giving student time to refresh their minds during the break time.."
+        }
+    ];
+
+    if (fadingSlides.length > 0 && captionTitle && captionDesc) {
+        let currentSlideIndex = 0;
+
+        // Run continuous execution routine exactly every 3000 milliseconds
+        setInterval(() => {
+            // Remove the active visibility state from the picture currently on screen
+            fadingSlides[currentSlideIndex].classList.remove("active");
+            
+            // Increment index pointer safely using standard modulus division loop wrapping
+            currentSlideIndex = (currentSlideIndex + 1) % fadingSlides.length;
+            
+            // Apply the active layout visibility rules to the newly focused index target
+            fadingSlides[currentSlideIndex].classList.add("active");
+
+            // Update matching text copy layout strings at the exact point of transition
+            captionTitle.textContent = slideMetadata[currentSlideIndex].title;
+            captionDesc.textContent = slideMetadata[currentSlideIndex].desc;
+        }, 3000);
+    }
+});
+
+    </script>
+</body>
+</html>
